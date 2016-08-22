@@ -1,14 +1,14 @@
 #! /usr/bin/env python
+from __future__ import print_function
+from builtins import input
+
 import time
+import sys
 
 class Brainfuck:
-
     debug = False
-    out_string = ""
-    in_string = ""
 
-    def __init__(self, cells=20):
-
+    def __init__(self, cells=256):
         self.memory  = [0 for x in range(0, cells)]
         self.pointer = 0
 
@@ -35,10 +35,8 @@ class Brainfuck:
 
     def run(self, program):
         self.program = program
-        print (self.program)
+        print ("Running program:\n" + self.program)
         while self.cursor < len(self.program):
-            #print ("\r{0}^".format(" " * self.cursor), end="")
-
             if self.debug:
                 print ("Token: {0}  {1}".format(self.program[self.cursor], [m for m in self.memory]), end="")
 
@@ -48,13 +46,8 @@ class Brainfuck:
                 print (" -> {0}".format([m for m in self.memory]))
 
             self.cursor += 1
-            #time.sleep(.01)
 
-        if self.out_string:
-            print(self.out_string)
-
-
-    ## Operators
+    ## Operations
     def forward(self):
         if self.pointer < len(self.memory)  - 1:
             self.pointer += 1
@@ -74,27 +67,17 @@ class Brainfuck:
         self.memory[self.pointer] -= 1
 
     def output(self):
-        self.out_string += chr(self.memory[self.pointer])
-        #print(chr(self.memory[self.pointer]), end="")
+        print(chr(self.memory[self.pointer]), end="")
 
     def input(self):
-        while not self.in_string:
-            self.in_string = input()
-            if self.in_string == "":
-                break
-
-        h = self.in_string[0:1]
-
-        if h == "":
-            self.memory[self.pointer] = -1
-        else:
-            self.in_string = self.in_string[1:]
-            self.memory[self.pointer] = ord(h)
+        c = input("\nEnter a character: ")
+        if c:
+            self.memory[self.pointer] = ord(c)
 
     def start_loop(self):
         if self.memory[self.pointer] == 0:
             brackets = 0
-            for c in range(self.cursor+1, len(self.program)):
+            for c in range(self.cursor + 1, len(self.program)):
                 t = self.program[c]
                 if t == '[':
                     brackets += 1
@@ -110,7 +93,7 @@ class Brainfuck:
     def stop_loop(self):
         if self.memory[self.pointer] != 0:
             brackets = 0
-            for c in range(self.cursor-1, -1, -1):
+            for c in range(self.cursor - 1, -1, -1):
                 t = self.program[c]
                 if t == ']':
                     brackets += 1
@@ -127,4 +110,4 @@ class Brainfuck:
 if __name__ == '__main__':
     bf = Brainfuck()
     #bf.run("++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.")
-    bf.run("-,+[-[>>++++[>++++++++<-]<+<-[>+>+>-[>>>]<[[>+<-]>>+>]<<<<<-]]>>>[-]+>--[-[<->[-]]]<[++++++++++++<[>-[>+>>]>[+[<+>-]>+>>]<<<<<-]>>[<+>-]>[-[-<<[-]>>]<<[<<->>-]>>]<<[<<+>>-]]<[-]<.[-]<-,+]")
+    bf.run("-,+[-[>>++++[>++++++++<-]<+<-[>+>+>-[>>>]<[[>+<-]>>+>]<<<<<-]]>>>[-]+>--[-[<->+++[-]]]<[++++++++++++<[>-[>+>>]>[+[<+>-]>+>>]<<<<<-]>>[<+>-]>[-[-<<[-]>>]<<[<<->>-]>>]<<[<<+>>-]]<[-]<.[-]<-,+]")
